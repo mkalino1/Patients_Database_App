@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 app.patients = []
@@ -40,4 +41,4 @@ def patient_info(pk: int):
     if pk >= 0 and pk < len(app.patients):
         return app.patients[pk]
     else:
-        return 404
+        return JSONResponse(status_code = status.HTTP_204_NO_CONTENT)
