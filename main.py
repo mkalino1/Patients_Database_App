@@ -38,7 +38,7 @@ def receive_data(data: dict):
 
 @app.get("/patient/{pk}")
 def patient_info(pk: int):
-    if pk >= 0 and pk < len(app.patients):
+    if 0 <= pk < len(app.patients):
         return app.patients[pk]
     else:
-        return JSONResponse(status_code = status.HTTP_204_NO_CONTENT)
+        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
