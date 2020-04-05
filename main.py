@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 app = FastAPI()
-app.counter = -1
+app.patients = []
 
 
 @app.get("/")
@@ -31,6 +31,13 @@ def method_delete():
 
 @app.post("/patient")
 def receive_data(data: dict):
-    app.counter += 1
-    return {"id": app.counter, "patient": data}
+    app.patients.append(data)
+    return {"id": len(app.patients)-1, "patient": data}
 
+
+@app.get("/patient/{pk}")
+def patient_info(pk: int):
+    if pk >= 0 and pk < len(app.patients):
+        return app.patients[pk]
+    else:
+        return 404
