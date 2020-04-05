@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 app = FastAPI()
+app.counter = -1
 
 
 @app.get("/")
@@ -9,20 +10,27 @@ def hello_pandemic():
 
 
 @app.get("/method")
-def read_item():
+def method_get():
     return {"method": "GET"}
 
 
 @app.post("/method")
-def read_item():
+def method_post():
     return {"method": "POST"}
 
 
 @app.put("/method")
-def read_item():
+def method_put():
     return {"method": "PUT"}
 
 
 @app.delete("/method")
-def read_item():
+def method_delete():
     return {"method": "DELETE"}
+
+
+@app.post("/patient")
+def receive_data(data: dict):
+    app.counter += 1
+    return {"id": app.counter, "patient": data}
+
