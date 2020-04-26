@@ -46,6 +46,7 @@ def logout(*, response: Response, session_token: str = Cookie(None)):
         raise HTTPException(status_code=401, detail="Unauthorized")
     app.tokens_storage.pop(session_token)
     response.headers["Location"] = "/"
+    response.status_code = status.HTTP_302_FOUND
 
 
 #********************** ZAJECIA 1 ******************
