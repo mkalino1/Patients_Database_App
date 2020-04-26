@@ -1,6 +1,7 @@
-from fastapi import FastAPI , HTTPException, Response, status, Depends, Cookie
+from fastapi import FastAPI , HTTPException, Response, status, Depends, Cookie, Request
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
 from hashlib import sha256
+from fastapi.templating import Jinja2Templates
 import secrets
 
 
@@ -15,10 +16,14 @@ security = HTTPBasic()
 
 username = 'trudnY'
 password = 'PaC13Nt'
+templates = Jinja2Templates(directory="templates")
 
-@app.get("/welcome")
-def hello_welcome():
-    return {"message": "Welcome welcome!"}
+
+@app.get('/welcome')
+def welcome(request: Request, session_token: str = Cookie(None)):
+    if session_token not in app.tokens_storage:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return templates.TemplateResponse("item.html", {"request": request, "user": "trudnY"})
 
 
 @app.post('/login')
