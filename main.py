@@ -13,6 +13,7 @@ app.tokens_storage = []
 app.user = {'trudnY': 'PaC13Nt'}
 security = HTTPBasic()
 
+
 @app.get("/welcome")
 def hello_welcome():
     return {"message": "Welcome welcome!"}
@@ -34,7 +35,7 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     response.set_cookie(key="session_token", value=session_token)
     response.headers["Location"] = "/welcome"
     response.status_code = status.HTTP_302_FOUND
-    return response
+    #return response
 
 
 @app.get("/")
