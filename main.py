@@ -5,6 +5,11 @@ app = FastAPI()
 app.patients = []
 
 
+@app.get("/welcome")
+def hello_pandemic():
+    return {"message": "Welcome welcome!"}
+
+
 @app.get("/")
 def hello_pandemic():
     return {"message": "Hello World during the coronavirus pandemic!"}
