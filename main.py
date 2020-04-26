@@ -3,12 +3,16 @@ from fastapi.security import HTTPBasicCredentials, HTTPBasic
 from hashlib import sha256
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+from typing import Dict
 import secrets
 
+class Patient(BaseModel):
+    name: str
+    surname: str
 
 app = FastAPI()
 app.counter: int = 0
-app.patients_storage = []
+app.patients_storage: Dict[int, Patient] = {}
 app.secret_key = 'this_is_a_secret_string'
 app.tokens_storage = {}
 # app.user = {'trudnY': 'PaC13Nt'}
@@ -19,9 +23,7 @@ password = 'PaC13Nt'
 templates = Jinja2Templates(directory="templates")
 
 
-class Patient(BaseModel):
-    name: str
-    surname: str
+
 
 
 @app.get('/welcome')
@@ -62,38 +64,46 @@ def logout(*, response: Response, session_token: str = Cookie(None)):
 
 
 @app.post("/patient")
-def add_patient(*, response: Response, patient: Patient, session_token: str = Cookie(None)):
+async def add_patient(patient: Patient,response: Response, session_token: str = Cookie(None)):
     if session_token not in app.tokens_storage:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    if app.counter > len(app.patients_storage):
-        app.patients_storage.append(patient)
-    response.set_cookie(key="session_token", value=session_token)
-    response.headers["Location"] = f"/patient/{len(app.patients_storage)-1}"
-    response.status_code = status.HTTP_302_FOUND
+        raise HTTPException(status_code=401, detail="Unathorised")
+    app.patients_storage[app.counter] = patient
+    response.headers["Location"] = f"/patient/{app.counter}"
+    response.status_code = 302
+    app.counter += 1
+    return response
 
 
 @app.get("/patient")
-def show_patients(response: Response, session_token: str = Cookie(None)):
+def show_patients(response:Response, session_token: str = Cookie(None)):
     if session_token not in app.tokens_storage:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+        raise HTTPException(status_code=401, detail="Unathorised")
+    if len(app.patients_storage) == 0:
+        raise HTTPException(status_code=204)
     return app.patients_storage
 
 
-@app.get("/patients/{id}")
-def show_patient(response: Response, id: int, session_token: str = Cookie(None)):
+@app.get("/patient/{pk}")
+def show_patient(pk: int, response:Response, session_token: str = Cookie(None)):
     if session_token not in app.tokens_storage:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    response.set_cookie(key="session_token", value=session_token)
-    if id < len(app.patients_storage):
-        return app.patients_storage[id]
+        raise HTTPException(status_code=401, detail="Unathorised")
+    if pk in app.patients_storage:
+        return app.patients_storage.get(pk)
+    else:
+        raise HTTPException(status_code=204)
 
 
-@app.delete("patient/{id}")
-def delete_patient(response: Response, id: int, session_token: str = Cookie(None)):
+@app.delete("/patient/{pk}")
+async def delete_patient(pk: int, response: Response, session_token: str = Cookie(None)):
     if session_token not in app.tokens_storage:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    app.patients_storage.remove(id)
-    response.status_code = status.HTTP_204_NO_CONTENT
+        raise HTTPException(status_code=401, detail="Unathorised")
+    if pk in app.tokens_storage:
+        del app.tokens_storage[pk]
+        response.headers["Location"] = "/patient"
+        response.status_code = 204
+        return response
+    else:
+        raise HTTPException(status_code=204)
 
 
 #********************** ZAJECIA 1 **********************************
