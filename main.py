@@ -10,9 +10,11 @@ app.token_counter: int = 0
 app.patients_storage = []
 app.secret_key = 'this_is_a_secret_string'
 app.tokens_storage = {}
-app.user = {'trudnY': 'PaC13Nt'}
+# app.user = {'trudnY': 'PaC13Nt'}
 security = HTTPBasic()
 
+username = 'trudnY'
+password = 'PaC13Nt'
 
 @app.get("/welcome")
 def hello_welcome():
@@ -21,7 +23,7 @@ def hello_welcome():
 
 @app.post('/login')
 def login(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
-    username, password = app.user.items()
+    # username, password = app.user.items()
     correct_username = secrets.compare_digest(credentials.username, username)
     correct_password = secrets.compare_digest(credentials.password, password)
     if not (correct_username and correct_password):
@@ -35,7 +37,7 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     response.set_cookie(key="session_token", value=session_token)
     response.headers["Location"] = "/welcome"
     response.status_code = status.HTTP_302_FOUND
-    #return response
+    return response
 
 
 @app.get("/")
