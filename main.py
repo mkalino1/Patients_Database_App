@@ -9,7 +9,7 @@ app.counter: int = 0
 app.token_counter: int = 0
 app.patients_storage = []
 app.secret_key = 'this_is_a_secret_string'
-app.tokens_storage = []
+app.tokens_storage = {}
 app.user = {'trudnY': 'PaC13Nt'}
 security = HTTPBasic()
 
