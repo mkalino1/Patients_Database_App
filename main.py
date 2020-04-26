@@ -1,4 +1,4 @@
-from fastapi import FastAPI , HTTPException, Response, status, Depends
+from fastapi import FastAPI , HTTPException, Response, status, Depends, Cookie
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
 from hashlib import sha256
 import secrets
@@ -39,6 +39,16 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     response.status_code = status.HTTP_302_FOUND
     return response
 
+
+@app.post('/logout')
+def logout(*, response: Response, session_token: str = Cookie(None)):
+    if session_token not in app.tokens_storage:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    app.tokens_storage.pop(session_token)
+    response.headers["Location"] = "/"
+
+
+#********************** ZAJECIA 1 ******************
 
 @app.get("/")
 def hello_pandemic():
