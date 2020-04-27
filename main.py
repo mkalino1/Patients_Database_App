@@ -15,15 +15,11 @@ app.counter: int = 0
 app.patients_storage: Dict[int, Patient] = {}
 app.secret_key = 'this_is_a_secret_string'
 app.tokens_storage = {}
-# app.user = {'trudnY': 'PaC13Nt'}
 security = HTTPBasic()
 
 username = 'trudnY'
 password = 'PaC13Nt'
 templates = Jinja2Templates(directory="templates")
-
-
-
 
 
 @app.get('/welcome')
@@ -35,7 +31,6 @@ def welcome(request: Request, session_token: str = Cookie(None)):
 
 @app.post('/login')
 def login(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
-    # username, password = app.user.items()
     correct_username = secrets.compare_digest(credentials.username, username)
     correct_password = secrets.compare_digest(credentials.password, password)
     if not (correct_username and correct_password):
